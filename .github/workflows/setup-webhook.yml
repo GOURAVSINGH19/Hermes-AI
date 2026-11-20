@@ -1,0 +1,50 @@
+name: setup-webhook
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Vercel webhook URL"
+        required: true
+        default: "https://hermesbot-beta.vercel.app/api/telegram"
+        type: string
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Telegram webhook
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET }}
+          URL: ${{ inputs.url }}
+        run: |
+          curl -sS -X POST "https://api.telegram.org/bot${TOKEN}/setWebhook" \
+            --data-urlencode "url=${URL}" \
+            --data-urlencode "secret_token=${SECRET}" \
+            --data-urlencode "drop_pending_updates=true"
+          echo
+
+      - name: Set command menu
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -sS -X POST "https://api.telegram.org/bot${TOKEN}/setMyCommands" \
+            -H "Content-Type: application/json" \
+            -d '{"commands":[
+              {"command":"news","description":"Latest AI news"},
+              {"command":"lesson","description":"Today'"'"'s lesson again"},
+              {"command":"next","description":"Next lesson in the course"},
+              {"command":"topic","description":"Lesson on any topic"},
+              {"command":"ask","description":"Ask a system design question"},
+              {"command":"list","description":"All topics and your progress"},
+              {"command":"help","description":"Show commands"}
+            ]}'
+          echo
+
+      - name: Show webhook status
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -sS "https://api.telegram.org/bot${TOKEN}/getWebhookInfo"
+          echo
