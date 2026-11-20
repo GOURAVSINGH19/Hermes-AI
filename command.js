@@ -1,12 +1,12 @@
-const { sendLatestNews } = require("./lib/news");
+const { sendNews } = require("./lib/news");
 const lessons = require("./lib/lessons");
 const { COMMANDS, parseCommand } = require("./lib/commands");
 const { sendErrorMessage } = require("./lib/telegram");
 
 const HANDLERS = {
-  news: () => sendLatestNews(),
-  lesson: () => lessons.resendLatestLesson(),
-  next: () => lessons.sendNextLesson(),
+  news: () => sendNews(),
+  lesson: () => lessons.sendTodaysLesson(),
+  next: () => lessons.sendTomorrowsLesson(),
   topic: text => lessons.sendCustomLesson(text),
   ask: text => lessons.answerQuestion(text),
   list: () => lessons.sendCourseProgress(),

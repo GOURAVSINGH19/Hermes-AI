@@ -1,6 +1,7 @@
 const { COMMANDS, parseCommand, helpMessage } = require("../lib/commands");
-const { startCommandWorkflow, readSavedState } = require("../lib/github");
-const { formatCourseProgress } = require("../lib/progress");
+const { startCommandWorkflow } = require("../lib/github");
+const { loadTopics } = require("../lib/topics");
+const { formatCourseProgress } = require("../lib/course");
 const { sendMessage, sendErrorMessage } = require("../lib/telegram");
 const { escapeHtml } = require("../lib/html");
 
@@ -58,7 +59,7 @@ async function handleUpdate(update) {
 
   if (!command) return sendMessage(`Unknown command /${escapeHtml(name)}\n\n${helpMessage()}`);
   if (name === "help") return sendMessage(helpMessage());
-  if (name === "list") return sendMessage(formatCourseProgress((await readSavedState()).nextTopicIndex));
+  if (name === "list") return sendMessage(formatCourseProgress(await loadTopics()));
   if (command.argument && !text) return sendMessage(`Usage: ${command.example}`);
 
   await startCommandWorkflow(name, text);

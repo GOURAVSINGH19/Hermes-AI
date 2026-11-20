@@ -42,11 +42,11 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"commands":[
               {"command":"news","description":"Latest AI news"},
-              {"command":"lesson","description":"Today'"'"'s lesson again"},
-              {"command":"next","description":"Next lesson in the course"},
+              {"command":"lesson","description":"Today'"'"'s system design lesson"},
+              {"command":"next","description":"Tomorrow'"'"'s lesson, to read ahead"},
               {"command":"topic","description":"Lesson on any topic"},
               {"command":"ask","description":"Ask a system design question"},
-              {"command":"list","description":"All topics and your progress"},
+              {"command":"list","description":"All topics and today'"'"'s place"},
               {"command":"help","description":"Show commands"}
             ]}'
           echo
