@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: hermes-data
+  group: daily-news
   cancel-in-progress: false
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Send AI news and system design lesson to Telegram
-        run: node news.js
+        run: node daily.js
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -41,5 +41,8 @@ jobs:
           git add -A data
           git diff --cached --quiet && exit 0
           git commit -m "daily: $(date -u +%F)"
-          git pull --rebase
-          git push
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
