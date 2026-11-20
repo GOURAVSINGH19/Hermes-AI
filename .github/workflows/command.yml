@@ -1,0 +1,55 @@
+name: command
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        required: true
+        type: string
+      text:
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hermes-data
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Run Telegram command
+        run: node command.js
+        env:
+          CMD: ${{ inputs.command }}
+          CMD_TEXT: ${{ inputs.text }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Commit data files
+        if: always()
+        run: |
+          git config user.name "news-bot"
+          git config user.email "news-bot@users.noreply.github.com"
+          git add -A data
+          git diff --cached --quiet && exit 0
+          git commit -m "command: ${CMD} $(date -u +%F)"
+          git pull --rebase
+          git push
+        env:
+          CMD: ${{ inputs.command }}
