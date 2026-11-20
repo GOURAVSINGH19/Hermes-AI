@@ -13,6 +13,15 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+      - name: Check secrets
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "::error::Add the TELEGRAM_BOT_TOKEN secret in GitHub"; exit 1; fi
+          if [ -z "$SECRET" ]; then echo "::error::Add the TELEGRAM_WEBHOOK_SECRET secret in GitHub (same value as in Vercel)"; exit 1; fi
+          if ! echo "$SECRET" | grep -Eq '^[A-Za-z0-9_-]{1,256}$'; then echo "::error::TELEGRAM_WEBHOOK_SECRET may only contain letters, numbers, _ and -"; exit 1; fi
+
       - name: Set Telegram webhook
         env:
           TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
